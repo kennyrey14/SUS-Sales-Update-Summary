@@ -41,7 +41,7 @@ body {
 }
 
 .input-group input {
-    width: 100%;
+    width: 80%;
     padding: 12px 40px 12px 10px;
     border: none;
     border-radius: 5px;
@@ -50,7 +50,7 @@ body {
 
 .icon {
     position: absolute;
-    right: 12px;
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
     color: #666;
@@ -80,13 +80,13 @@ body {
         <div class="logo">
             <img src="natrapharm_logo.png" alt="Natrapharm Logo">
         </div>
-        <form>
+        <form action = "homepage.php" method = "post">
             <div class="input-group">
                 <input type="text" placeholder="User ID" required>
                 <span class="icon">&#128100;</span> <!-- User Icon -->
             </div>
             <div class="input-group">
-                <input type="password" placeholder="**********" required>
+                <input type="password" placeholder="Password" required>
                 <span class="icon">&#128274;</span> <!-- Lock Icon -->
             </div>
             <button type="submit" class="login-btn">Login</button>
