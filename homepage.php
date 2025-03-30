@@ -56,7 +56,7 @@
             echo "<h2>Welcome " . htmlspecialchars($username) . "!</h2>";
         } else {
             $_SESSION['error_message'] = 'Your username or password is incorrect';
-            header("Location: http://localhost/myNewWebsite-1/index.php");
+            header("Location: http://localhost/SUS-Sales-Update-Summary/index.php");
             exit();
         }
     }
