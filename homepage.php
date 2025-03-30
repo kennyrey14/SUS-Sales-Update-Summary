@@ -26,7 +26,7 @@
     </style>
 </head>
 <body>
-<div class="logo">
+        <div class="logo">
             <img src="natrapharm_logo.png" alt="Natrapharm Logo">
         </div>
 
@@ -56,10 +56,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $conn->query($sql);
 
 
-
+session_start();
     if ($result->num_rows > 0) {
         echo "<h2>Welcome " . htmlspecialchars($username) . "!</h2>";
     } else {
+        $_SESSION['error_message'] = 'Your username or password is incorrect';
         header("Location: http://localhost/myNewWebsite-1/index.php");
         exit(); // Always exit after a header redirect
     }

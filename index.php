@@ -81,13 +81,20 @@ body {
             <img src="natrapharm_logo.png" alt="Natrapharm Logo">
         </div>
         <form action = "homepage.php" method = "post">
-            <div class="input-group">
+        <?php
+            session_start();
+            if (isset($_SESSION['error_message'])) {
+                echo '<p style="color: red;">' . htmlspecialchars($_SESSION['error_message']) . '</p>';
+            unset($_SESSION['error_message']);
+            }
+        ?>
+        <div class="input-group">
                 <input type="text" placeholder="User ID" name = "username" required>
-                <span class="icon">&#128100;</span> <!-- User Icon -->
+                <span class="icon">&#128100;</span>
             </div>
             <div class="input-group">
                 <input type="password" placeholder="Password" name = "password" required>
-                <span class="icon">&#128274;</span> <!-- Lock Icon -->
+                <span class="icon">&#128274;</span>
             </div>
             <button type="submit" class="login-btn">Login</button>
         </form>
