@@ -58,7 +58,7 @@ body {
 
 /* Login Button */
 .login-btn {
-    width: 100%;
+    width: 80%;
     padding: 12px;
     background-color: #d72626;
     color: white;
@@ -82,11 +82,11 @@ body {
         </div>
         <form action = "homepage.php" method = "post">
             <div class="input-group">
-                <input type="text" placeholder="User ID" required>
+                <input type="text" placeholder="User ID" name = "username" required>
                 <span class="icon">&#128100;</span> <!-- User Icon -->
             </div>
             <div class="input-group">
-                <input type="password" placeholder="Password" required>
+                <input type="password" placeholder="Password" name = "password" required>
                 <span class="icon">&#128274;</span> <!-- Lock Icon -->
             </div>
             <button type="submit" class="login-btn">Login</button>
