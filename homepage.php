@@ -4,63 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        .table-container {
-            max-height: 400px;
-            overflow: auto;
-            border: 1px solid #ddd;
-            margin-top: 10px;
-        }
-
-        table {
-            width: 70%;
-            margin-left: 20%;
-            border-collapse: collapse;
-        }
-
-        td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            border: 1px solid black;
-            background-color: #f2f2f2;
-            position: sticky;
-            top: 0;
-            z-index: 1;
-        }
-
-        .logo img {
-            max-width: 120px;
-            margin-bottom: 15px;
-        }
-
-        .container {
-            display: flex;
-            /* Use Flexbox layout */
-            justify-content: center;
-            /* Align horizontally */
-            align-items: center;
-            /* Align vertically */
-            height: 100vh;
-            /* Take up full viewport height */
-        }
-
-        button {
-            width: 80px;
-            height: 35px;
-            margin-left: 50%;
-        }
-
-        select {
-            padding: 5px;
-            font-size: 14px;
-            text-align: center;
-        }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -118,20 +62,21 @@
     }
 
     ?>
-    <div class="table-container">
-        <div class="menu">
-            <label for="actions">Choose an action:</label>
-            <!-- <form method="POST" action=""> -->
-            <select name="action" id="actions">
-                <option value="data">Data</option>
-                <option value="district">District Summary</option>
-                <option value="territory">Territory Summary</option>
-                <option value="details">Details</option>
-            </select>
-            <input type="submit" value="View">
-            <!-- </form> -->
 
-        </div>
+    <div class="menu">
+        <!-- <label for="actions">:</label> -->
+        <!-- <form method="POST" action=""> -->
+        <select name="action" id="actions">
+            <option value="data">Data</option>
+            <option value="district">District Summary</option>
+            <option value="territory">Territory Summary</option>
+            <option value="details">Details</option>
+        </select>
+        <input type="submit" value="View">
+        <!-- </form> -->
+
+    </div>
+    <div class="table-container">
         <table>
             <tr>
                 <th>Invoice Date</th>
