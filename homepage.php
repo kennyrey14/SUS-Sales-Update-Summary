@@ -21,20 +21,19 @@
     
     $conn = new mysqli($host, $user, $pass, $dbname);
 
-    // Step 2: Check Connection
+    // Check Connection
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
 
-    // Step 3: Fetch Sales Data
+    // Fetch Sales Data
     
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $username = htmlspecialchars($_POST["username"]);
         $password = htmlspecialchars($_POST["password"]);
 
-
-        $sql = "SELECT * FROM 2025_sales_update WHERE ProductCode = '$username'";
+        $sql = "SELECT * FROM managers_info WHERE empCode = '$username'";
         $result = $conn->query($sql);
 
         // $action = $_POST['action'];
@@ -47,12 +46,19 @@
         // } else {
         //     $sql = "SELECT * FROM 2025_sales_update";
         // }
-        $sqlForm = "SELECT * FROM 2025_sales_update";
+
+        $limit = 50; // Show 50 records per page
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $offset = ($page - 1) * $limit;
+
+        $sqlForm = "SELECT * FROM sales_update LIMIT $limit OFFSET $offset" ;
         $query = $conn->query($sqlForm);
 
 
         session_start();
         if ($result->num_rows > 0) {
+            $sql = "SELECT * FROM managers_info WHERE empCode = '$username'";
+            $result = $conn->query($sql);
             echo "<h2>Welcome " . htmlspecialchars($username) . "!</h2>";
         } else {
             $_SESSION['error_message'] = 'Your username or password is incorrect';
@@ -89,30 +95,41 @@
                 <th>Amount (VAT Included)</th>
                 <th>Invoice No</th>
             </tr>
-
+<!-- 
             <?php
-            // Step 4: Display Data in Table
+            // Display Data in Table
             if ($query->num_rows > 0) {
                 while ($row = $query->fetch_assoc()) {
                     echo "<tr>";
-                    echo "<td>" . $row["InvcDate"] . "</td>";
+                    echo "<td>" . $row["source"] . "</td>";
                     echo "<td>" . $row["Month"] . "</td>";
                     echo "<td>" . $row["Year"] . "</td>";
+                    echo "<td>" . $row["CustomerNo"] . "</td>";
                     echo "<td>" . $row["CustomerName"] . "</td>";
+                    echo "<td>" . $row["TerritoryCode"] . "</td>";
+                    echo "<td>" . $row["TerritoryDescription"] . "</td>";
+                    echo "<td>" . $row["DistrictCode"] . "</td>";
+                    echo "<td>" . $row["DistrictDescription"] . "</td>";
                     echo "<td>" . $row["ProductCode"] . "</td>";
                     echo "<td>" . $row["ProductDescription"] . "</td>";
+                    echo "<td>" . $row["Price"] . "</td>";
+                    echo "<td>" . $row["DivisionCode"] . "</td>";
+                    echo "<td>" . $row["DivisionDescription"] . "</td>";
                     echo "<td>" . $row["Quantity"] . "</td>";
                     echo "<td>" . $row["AmountIncludingVAT"] . "</td>";
                     echo "<td>" . $row["InvoiceNo"] . "</td>";
+                    echo "<td>" . $row["CustomerPostingGrpCode"] . "</td>";
+                    echo "<td>" . $row["FamilyCode"] . "</td>";
+
                     echo "</tr>";
                 }
             } else {
                 echo "<tr><td colspan='9'>No sales data found</td></tr>";
             }
 
-            // Step 5: Close Connection
+            // Close Connection
             $conn->close();
-            ?>
+            ?> -->
         </table>
     </div>
     <button> Download </button>
