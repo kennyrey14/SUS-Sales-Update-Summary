@@ -1,3 +1,68 @@
+<?php
+$host = "localhost";
+$user = "root";
+$pass = "";
+$dbname = "test";
+
+$conn = new mysqli($host, $user, $pass, $dbname);
+
+// Check Connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST['username'])) {
+        $username = htmlspecialchars($_POST["username"]);
+        $password = htmlspecialchars($_POST["password"]);
+
+        // $username = $conn->real_escape_string($username); // Prevent SQL Injection
+        $sql = "SELECT * FROM managers_info WHERE empCode = '$username'";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            echo "<h2>Welcome " . htmlspecialchars($username) . "!</h2>";
+        } else {
+            session_start();
+            $_SESSION['error_message'] = "Invalid username or password";
+            header("Location: index.php");
+            exit();
+        }
+
+    }
+
+    $selected_action = isset($_POST['action']) ? $_POST['action'] : "data";
+
+}
+
+$limit = 50;
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
+// SQL Query based on selection
+
+switch ($selected_action) {
+    case 'data':
+        $sqlForm = "SELECT * FROM sales_update LIMIT $limit OFFSET $offset";
+        break;
+    case 'district':
+        $sqlForm = "SELECT * FROM sales_update WHERE CustomerNo ='WATSON-40962' LIMIT $limit OFFSET $offset";
+        break;
+    case 'territory':
+        $sqlForm = "SELECT * FROM sales_update WHERE TerritoryCode IS NOT NULL LIMIT $limit OFFSET $offset";
+        break;
+    case 'details':
+        $sqlForm = "SELECT * FROM sales_update WHERE CustomerNo IS NOT NULL LIMIT $limit OFFSET $offset";
+        break;
+    default:
+        $sqlForm = "SELECT * FROM sales_update LIMIT $limit OFFSET $offset";
+}
+
+$query = $conn->query($sqlForm);
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,6 +70,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
+    <title>Sales Update</title>
 </head>
 
 <body>
@@ -12,127 +78,82 @@
         <img src="natrapharm_logo.png" alt="Natrapharm Logo">
     </div>
 
-    <?php
-
-    $host = "localhost";  // XAMPP default host
-    $user = "root";       // Default MySQL user
-    $pass = "";           // No password by default
-    $dbname = "test"; // Change this to your actual DB name
-    
-    $conn = new mysqli($host, $user, $pass, $dbname);
-
-    // Check Connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    // Fetch Sales Data
-    
-
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $username = htmlspecialchars($_POST["username"]);
-        $password = htmlspecialchars($_POST["password"]);
-
-        $sql = "SELECT * FROM managers_info WHERE empCode = '$username'";
-        $result = $conn->query($sql);
-
-        // $action = $_POST['action'];
-        // if ($action == 'data') {
-        //     $sql = "SELECT * FROM 2025_sales_update";
-        // } else if ($action == "district") {
-        //     $sql = "SELECT * FROM 2025_sales_update";
-        // } else if ($action == "territory") {
-        //     $sql = "SELECT * FROM 2025_sales_update";
-        // } else {
-        //     $sql = "SELECT * FROM 2025_sales_update";
-        // }
-
-        $limit = 50; // Show 50 records per page
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $offset = ($page - 1) * $limit;
-
-        $sqlForm = "SELECT * FROM sales_update LIMIT $limit OFFSET $offset" ;
-        $query = $conn->query($sqlForm);
-
-
-        session_start();
-        if ($result->num_rows > 0) {
-            $sql = "SELECT * FROM managers_info WHERE empCode = '$username'";
-            $result = $conn->query($sql);
-            echo "<h2>Welcome " . htmlspecialchars($username) . "!</h2>";
-        } else {
-            $_SESSION['error_message'] = 'Your username or password is incorrect';
-            header("Location: http://localhost/SUS-Sales-Update-Summary/index.php");
-            exit();
-        }
-    }
-
-    ?>
-
     <div class="menu">
-        <!-- <label for="actions">:</label> -->
-        <!-- <form method="POST" action=""> -->
-        <select name="action" id="actions">
-            <option value="data">Data</option>
-            <option value="district">District Summary</option>
-            <option value="territory">Territory Summary</option>
-            <option value="details">Details</option>
-        </select>
-        <input type="submit" value="View">
-        <!-- </form> -->
-
+        <form method="POST">
+            <label for="action">Select an Option:</label>
+            <select name="action" id="action">
+                <option value="" disabled selected>Select an Option</option>
+                <option value="data" <?php if ($selected_action == "data")
+                    echo "selected"; ?>>Data</option>
+                <option value="district" <?php if ($selected_action == "district")
+                    echo "selected"; ?>>District Summary
+                </option>
+                <option value="territory" <?php if ($selected_action == "territory")
+                    echo "selected"; ?>>Territory Summary
+                </option>
+                <option value="details" <?php if ($selected_action == "details")
+                    echo "selected"; ?>>Details</option>
+            </select>
+            <input type="submit" value="Submit">
+        </form>
     </div>
+
     <div class="table-container">
         <table>
             <tr>
-                <th>Invoice Date</th>
                 <th>Month</th>
                 <th>Year</th>
-                <th>Customer Name</th>
-                <th>Product Code</th>
-                <th>Product Description</th>
+                <th>CustomerNo</th>
+                <th>CustomerName</th>
+                <th>TerritoryCode</th>
+                <th>TerritoryDescription</th>
+                <th>DistrictCode</th>
+                <th>DistrictDescription</th>
+                <th>ProductCode</th>
+                <th>ProductDescription</th>
+                <th>Price</th>
+                <th>DivisionCode</th>
+                <th>DivisionDescription</th>
                 <th>Quantity</th>
-                <th>Amount (VAT Included)</th>
-                <th>Invoice No</th>
+                <th>AmountIncludingVAT</th>
+                <th>InvoiceNo</th>
+                <th>CustomerPostingGrpCode</th>
+                <th>FamilyCode</th>
             </tr>
-<!-- 
             <?php
-            // Display Data in Table
             if ($query->num_rows > 0) {
                 while ($row = $query->fetch_assoc()) {
                     echo "<tr>";
-                    echo "<td>" . $row["source"] . "</td>";
-                    echo "<td>" . $row["Month"] . "</td>";
-                    echo "<td>" . $row["Year"] . "</td>";
-                    echo "<td>" . $row["CustomerNo"] . "</td>";
-                    echo "<td>" . $row["CustomerName"] . "</td>";
-                    echo "<td>" . $row["TerritoryCode"] . "</td>";
-                    echo "<td>" . $row["TerritoryDescription"] . "</td>";
-                    echo "<td>" . $row["DistrictCode"] . "</td>";
-                    echo "<td>" . $row["DistrictDescription"] . "</td>";
-                    echo "<td>" . $row["ProductCode"] . "</td>";
-                    echo "<td>" . $row["ProductDescription"] . "</td>";
-                    echo "<td>" . $row["Price"] . "</td>";
-                    echo "<td>" . $row["DivisionCode"] . "</td>";
-                    echo "<td>" . $row["DivisionDescription"] . "</td>";
-                    echo "<td>" . $row["Quantity"] . "</td>";
-                    echo "<td>" . $row["AmountIncludingVAT"] . "</td>";
-                    echo "<td>" . $row["InvoiceNo"] . "</td>";
-                    echo "<td>" . $row["CustomerPostingGrpCode"] . "</td>";
-                    echo "<td>" . $row["FamilyCode"] . "</td>";
-
+                    echo "<td>" . htmlspecialchars($row["Month"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["Year"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["CustomerNo"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["CustomerName"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["TerritoryCode"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["TerritoryDescription"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["DistrictCode"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["DistrictDescription"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["ProductCode"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["ProductDescription"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["Price"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["DivisionCode"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["DivisionDescription"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["Quantity"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["AmountIncludingVAT"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["InvoiceNo"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["CustomerPostingGrpCode"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["FamilyCode"]) . "</td>";
                     echo "</tr>";
                 }
             } else {
-                echo "<tr><td colspan='9'>No sales data found</td></tr>";
+                echo "<tr><td colspan='18'>No sales data found</td></tr>";
             }
-
-            // Close Connection
-            $conn->close();
-            ?> -->
+            ?>
         </table>
     </div>
-    <button> Download </button>
+
+    <button style="background: red; color: white;">Download</button>
+
+    <?php $conn->close(); ?>
 </body>
 
 </html>
