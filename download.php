@@ -37,14 +37,25 @@ $header = array_merge(
 );
 fputcsv($output, $header);
 
+if (isset($_POSTT['Download'])) {
+    $frYear = $_POST['frYear'];
+    $toYear = $_POST['toYear'];
+    $frMonth = $_POST['frYear'];
+    $toMonth = $_POST['frYear'];
+}
+
 // Query to fetch data in pivot format
 $sql = "SELECT ProductDescription, Year, Month, 
                SUM(Quantity) AS SumOfQuantity, 
                SUM(AmountIncludingVAT) AS SumOfAmount 
         FROM sales_updates
-        WHERE DivisionCode = '$divisionCode' AND Year = 2025 AND Month IN ('" . implode("','", $filteredMonths) . "')
+        WHERE DivisionCode = '$divisionCode' 
+            AND Year >= '$frYear' 
+            AND Year <= '$toYear' 
+            AND Month IN ('" . implode("','", $filteredMonths) . "')
         GROUP BY ProductDescription, Year, Month 
-        ORDER BY ProductDescription, Year, FIELD(Month, 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December')";
+        ORDER BY ProductDescription, Year, 
+            FIELD(Month, 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December')";
 
 $result = $conn->query($sql);
 
@@ -52,9 +63,7 @@ $result = $conn->query($sql);
 $data = [];
 $totalQuantity = 0;
 $totalAmount = 0;
-
-$totalQuantity = 0;
-$totalAmount = 0;
+$activeMonths = []; // Store only the months that have data
 
 while ($row = $result->fetch_assoc()) {
     $product = $row['ProductDescription'];
@@ -63,24 +72,38 @@ while ($row = $result->fetch_assoc()) {
     $amount = $row['SumOfAmount'];
 
     if (!isset($data[$product])) {
-        $data[$product] = array_fill_keys($filteredMonths, ["quantity" => 0, "amount" => 0]);
-        $data[$product]['yearly_quantity'] = 0;
-        $data[$product]['yearly_amount'] = 0;
+        $data[$product] = ["yearly_quantity" => 0, "yearly_amount" => 0];
     }
-    $data[$product][$month] = ["quantity" => $quantity, "amount" => $amount];
+
+    // Store only months that have data
+    if ($quantity > 0 || $amount > 0) {
+        $data[$product][$month] = ["quantity" => $quantity, "amount" => $amount];
+        $activeMonths[$month] = true; // Mark month as active
+    }
+
+    // Update yearly totals
     $data[$product]['yearly_quantity'] += $quantity;
     $data[$product]['yearly_amount'] += $amount;
 
+    // Update grand totals
     $totalQuantity += $quantity;
     $totalAmount += $amount;
 }
 
-// Write formatted rows
+// Keep only active months
+$filteredMonths = array_keys($activeMonths);
+
+// Write formatted rows with only active months
 foreach ($data as $product => $values) {
     $row = [$product];
     foreach ($filteredMonths as $month) {
-        $row[] = $values[$month]['quantity'];
-        $row[] = $values[$month]['amount'];
+        if (isset($values[$month])) {
+            $row[] = $values[$month]['quantity'];
+            $row[] = $values[$month]['amount'];
+        } else {
+            $row[] = 0;
+            $row[] = 0;
+        }
     }
     // Add yearly totals and grand totals
     $row[] = $values['yearly_quantity'];

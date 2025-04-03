@@ -46,8 +46,27 @@ button {
     margin-left: 50%;
 }
 
-select {
-    padding: 5px;
+.button-container {
+    display: flex;
+    gap: 10px;
+    /* Space between buttons */
+    align-items: center;
+    margin-top: 10px;
+}
+
+.download-button,
+.excel-button {
+    height: 30px;
+    width: 120px;
+    color: white;
+    border: none;
+    cursor: pointer;
     font-size: 14px;
     text-align: center;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 5px;
 }
